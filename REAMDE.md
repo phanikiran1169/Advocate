@@ -1,0 +1,4 @@
+Create evolved ads based on research from how ad agency’s perform testing. 
+
+Take a prompt based on the required customer whose ads we are generating, a generative model will create ads based on past research and use case of the customer company, the user of the application will add the name of the customer, the target audience[1], and the prompt of the kind of ad[2], these ads go out to the testing groups, MAX gets the analysis about how the ad works, we have an algorithm about which ad(which prompt) works better, [2]this is then further broken down into two prompts iteratively, based on the analysis.
+[1] the target audience is then improved by using the data to see who reacted with the audience best
