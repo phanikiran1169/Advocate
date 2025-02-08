@@ -1,12 +1,14 @@
 """
 Research agent implementation.
 """
+from datetime import datetime
 from typing import Dict, List, Optional
 from langchain.agents import AgentType
 from langchain.chat_models import AzureChatOpenAI
 from langchain.tools import Tool
 from ..base import BaseAgent
 from .prompts import RESEARCH_AGENT_PROMPT, QUESTION_GENERATION_PROMPT, DATA_ANALYSIS_PROMPT
+from models.vectorstore.base import BaseVectorStore
 
 class ResearchAgent(BaseAgent):
     """
@@ -17,7 +19,8 @@ class ResearchAgent(BaseAgent):
         llm: AzureChatOpenAI,
         tools: List[Tool],
         agent_type: AgentType = AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-        verbose: bool = True
+        verbose: bool = True,
+        vectorstore: Optional[BaseVectorStore] = None
     ):
         """
         Initialize the research agent.
@@ -33,6 +36,8 @@ class ResearchAgent(BaseAgent):
         self.question_chain = QUESTION_GENERATION_PROMPT
         self.analysis_chain = DATA_ANALYSIS_PROMPT
         self.collected_data: Dict[str, str] = {}
+        self.vectorstore = vectorstore
+        self.session_id = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         
     def _post_initialize(self) -> None:
         """
@@ -94,16 +99,47 @@ class ResearchAgent(BaseAgent):
             # Generate research questions
             questions = await self.generate_questions(input_text)
             
+            # Store questions in vector store if available
+            if self.vectorstore:
+                self.vectorstore.add_texts(
+                    texts=[questions],
+                    metadatas=[{
+                        "company_name": input_text,
+                        "content_type": "questions"
+                    }],
+                    session_id=self.session_id
+                )
+            
             # Execute research using agent
             raw_findings = await self.agent.arun(
                 self.research_chain.format(input=input_text)
             )
             
-            # Store collected data
+            # Store collected data and add to vector store
             self.collected_data[input_text] = raw_findings
+            if self.vectorstore:
+                self.vectorstore.add_texts(
+                    texts=[raw_findings],
+                    metadatas=[{
+                        "company_name": input_text,
+                        "content_type": "findings"
+                    }],
+                    session_id=self.session_id
+                )
             
             # Analyze findings
             analysis = await self.analyze_data(raw_findings)
+            
+            # Store analysis in vector store
+            if self.vectorstore:
+                self.vectorstore.add_texts(
+                    texts=[analysis],
+                    metadatas=[{
+                        "company_name": input_text,
+                        "content_type": "analysis"
+                    }],
+                    session_id=self.session_id
+                )
             
             # Combine results
             final_report = (
