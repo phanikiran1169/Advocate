@@ -1,4 +1,4 @@
-# AI Marketing Research & Ad Generator
+# AdVocate - AI Marketing Research & Ad Generator
 
 An AI-powered platform that automates market research, marketing strategy development, and advertisement generation through specialized AI agents.
 
