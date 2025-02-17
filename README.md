@@ -1,5 +1,7 @@
 # AdVocate - AI Marketing Research & Ad Generator
 
+https://github.com/user-attachments/assets/6c059cc0-d44a-4bb1-bfa6-79242062d869
+
 An AI-powered platform that automates market research, marketing strategy development, and advertisement generation through specialized AI agents.
 
 ## Core Components
@@ -11,6 +13,10 @@ An AI-powered platform that automates market research, marketing strategy develo
 - Produces structured reports
 
 ### Marketing Agent (`src/agents/marketing/`)
+
+
+
+
 - Analyzes brand voice
 - Creates audience profiles
 - Generates campaign ideas
